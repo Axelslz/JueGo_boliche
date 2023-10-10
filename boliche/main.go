@@ -1,19 +1,20 @@
 package main
 
 import (
-    "log"
-    "github.com/hajimehoshi/ebiten/v2"
-    "boliche/scenes"
+	"boliche/scenes"
+	"github.com/hajimehoshi/ebiten/v2"
+	"log"
 )
 
 func main() {
-    gameScene := &scenes.GameScene{}
+	
+	gameScene := scenes.NewGameScene()
 
-    ebiten.SetRunnableOnUnfocused(true)
-    if err := ebiten.RunGame(gameScene); err != nil {
-        log.Fatal(err)
-    }
+	ebiten.SetWindowSize(800, 600)
+	ebiten.SetWindowTitle("Boliche Game")
+
+	// Ejecutar el juego
+	if err := ebiten.RunGame(gameScene); err != nil {
+		log.Fatal(err)
+	}
 }
-
-
-

@@ -10,6 +10,5 @@ func NewBall() *Ball {
     return &Ball{
         X: 0.0,
         Y: 0.0,
-        // Inicializa otros campos si es necesario...
     }
 }
