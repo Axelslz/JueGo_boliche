@@ -6,6 +6,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"log"
 	"sync"
+	"fmt"
 )
 
 const (
@@ -17,12 +18,13 @@ var (
 	pinImage   *ebiten.Image
 	fondoImage *ebiten.Image
 	ballImage  *ebiten.Image
+	gameOverImage *ebiten.Image
 )
 
-// LoadResources carga los recursos de imágenes en goroutines y utiliza un canal para comunicar el estado.
+
 func LoadResources(loadedChan chan bool) {
 	var wg sync.WaitGroup
-	wg.Add(3) 
+	wg.Add(4) 
 
 	go func() {
 		defer wg.Done()
@@ -49,6 +51,14 @@ func LoadResources(loadedChan chan bool) {
 		if err != nil {
 			log.Fatalf("Error al cargar imagen de la bola: %v", err)
 		}
+	}()
+	go func() {
+		var err error
+		gameOverImage, _, err = ebitenutil.NewImageFromFile("assets/game_over.png")
+		if err != nil {
+			log.Fatalf("Error al cargar imagen de Game Over: %v", err)
+		}
+		loadedChan <- true
 	}()
 
 	wg.Wait() // Espera a que las tres goroutines finalicen.
@@ -85,4 +95,23 @@ func DrawBall(screen *ebiten.Image, ball *models.Ball) {
 	opts.GeoM.Scale(0.1, 0.1)
 	opts.GeoM.Translate(ball.X, ball.Y)
 	screen.DrawImage(ballImage, opts)
+}
+
+func DrawScore(screen *ebiten.Image, score int) {
+    ebitenutil.DebugPrint(screen, fmt.Sprintf("Puntuación: %d", score))
+}
+
+func DrawAttempts(screen *ebiten.Image, attempts int) {
+    ebitenutil.DebugPrint(screen, fmt.Sprintf("\n\nIntentos restantes: %d", attempts))
+}
+
+func DrawGameOver(screen *ebiten.Image) {
+	opts := &ebiten.DrawImageOptions{}
+	w, h := gameOverImage.Size()
+
+	x := (800 - float64(w)) / 2
+	y := (600 - float64(h)) / 2
+
+	opts.GeoM.Translate(x, y)
+	screen.DrawImage(gameOverImage, opts)
 }

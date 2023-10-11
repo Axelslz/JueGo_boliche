@@ -5,6 +5,8 @@ type Game struct {
 	Pins    []Pin
 	Running bool
 	SpacePressed bool
+	Score   int
+	Attempts int
 }
 
 type PinPosition int

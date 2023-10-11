@@ -28,6 +28,7 @@ func NewGameScene() *GameScene {
 				{X: 300, Y: 50, Position: models.BackRight},
 			},
 			Running: true,
+			Attempts: 3, // Añadido: Inicializar con 3 intentos.
 		},
 		collisionChan: make(chan bool),
 		loadedChan:    make(chan bool),
@@ -44,6 +45,7 @@ func (gs *GameScene) CollisionThread() {
 		for i := range gs.GameModel.Pins {
 			if !gs.GameModel.Pins[i].Hit && bolaGolpeaPin(gs.GameModel.Ball, gs.GameModel.Pins[i]) {
 				gs.GameModel.Pins[i].Hit = true
+				gs.GameModel.Score++
 			}
 		}
 	}
@@ -84,16 +86,28 @@ func (gs *GameScene) MoveBall() {
 	if gs.GameModel.Ball.Y < 0 {
 		gs.GameModel.Ball.Y = 550
 		gs.GameModel.Ball.SpeedY = 0
+		gs.GameModel.Attempts-- // Añadido: Reducir intentos
+
+		// Añadido: Si no hay más intentos, detener el juego
+		if gs.GameModel.Attempts <= 0 {
+			gs.GameModel.Running = false
+		}
 	}
 }
 
 func (gs *GameScene) Draw(screen *ebiten.Image) {
 	views.DrawGame(screen, gs.GameModel)
+	views.DrawScore(screen, gs.GameModel.Score)
+	views.DrawAttempts(screen, gs.GameModel.Attempts) 
+	if !gs.GameModel.Running {
+		views.DrawGameOver(screen)
+	}
 }
 
 func (gs *GameScene) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
 	return 800, 600
 }
+
 
 func bolaGolpeaPin(bola models.Ball, pin models.Pin) bool {
     radioBola := 15.0  
